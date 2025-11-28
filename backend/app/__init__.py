@@ -79,15 +79,15 @@ def create_app():
         app.logger.error(f'   Exception details: {repr(e)}')
         return jsonify({'error': str(e), 'type': type(e).__name__}), 400
     
-    # CORS configuration - DISABLED
-    # cors_origins = os.getenv('CORS_ORIGINS', '*').split(',')
-    # CORS(app, 
-    #      resources={r"/api/*": {"origins": cors_origins}},
-    #      supports_credentials=True,
-    #      allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Credentials"],
-    #      methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    #      expose_headers=["Content-Type", "Authorization"]
-    # )
+    # CORS configuration
+    cors_origins = os.getenv('CORS_ORIGINS', '*').split(',')
+    CORS(app, 
+         resources={r"/api/*": {"origins": cors_origins}},
+         supports_credentials=True,
+         allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Credentials"],
+         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+         expose_headers=["Content-Type", "Authorization"]
+    )
     
     # Register blueprints
     from app.routes import auth, items, categories, warehouses, suppliers, orders, reports, imports, custom_fields
@@ -101,6 +101,8 @@ def create_app():
     app.register_blueprint(reports.bp)
     app.register_blueprint(imports.bp)
     app.register_blueprint(custom_fields.bp)
+    app.register_blueprint(reports.bp)
+    app.register_blueprint(imports.bp)
     
     # Create tables
     with app.app_context():
