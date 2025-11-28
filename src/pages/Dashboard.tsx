@@ -5,10 +5,14 @@ import { api } from '@/lib/api';
 import { DashboardStats } from '@/types';
 import { Package, TrendingDown, Activity, AlertTriangle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ItemsModal } from '@/components/dashboard/ItemsModal';
+import { LowStockModal } from '@/components/dashboard/LowStockModal';
 
 const Dashboard = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [itemsModalOpen, setItemsModalOpen] = useState(false);
+  const [lowStockModalOpen, setLowStockModalOpen] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
@@ -46,7 +50,10 @@ const Dashboard = () => {
         <h2 className="text-3xl font-bold">Dashboard</h2>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="hover-scale">
+          <Card 
+            className="hover-scale cursor-pointer transition-all hover:shadow-lg"
+            onClick={() => setItemsModalOpen(true)}
+          >
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Total Items</CardTitle>
               <Package className="h-4 w-4 text-muted-foreground" />
@@ -54,7 +61,7 @@ const Dashboard = () => {
             <CardContent>
               <div className="text-2xl font-bold">{stats?.total_items || 0}</div>
               <p className="text-xs text-muted-foreground">
-                Unique items in inventory
+                Click to view all items
               </p>
             </CardContent>
           </Card>
@@ -72,7 +79,10 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="hover-scale border-orange-200 dark:border-orange-900">
+          <Card 
+            className="hover-scale cursor-pointer transition-all hover:shadow-lg border-orange-200 dark:border-orange-900"
+            onClick={() => setLowStockModalOpen(true)}
+          >
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Low Stock Items</CardTitle>
               <AlertTriangle className="h-4 w-4 text-orange-500" />
@@ -82,7 +92,7 @@ const Dashboard = () => {
                 {stats?.low_stock_items || 0}
               </div>
               <p className="text-xs text-muted-foreground">
-                Items below reorder level
+                Click to view details
               </p>
             </CardContent>
           </Card>
@@ -133,6 +143,9 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      <ItemsModal isOpen={itemsModalOpen} onClose={() => setItemsModalOpen(false)} />
+      <LowStockModal isOpen={lowStockModalOpen} onClose={() => setLowStockModalOpen(false)} />
     </Layout>
   );
 };
