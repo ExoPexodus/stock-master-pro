@@ -9,11 +9,6 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Items from "./pages/Items";
-import Categories from "./pages/Categories";
-import Warehouses from "./pages/Warehouses";
-import Suppliers from "./pages/Suppliers";
-import Orders from "./pages/Orders";
-import AuditLogs from "./pages/AuditLogs";
 import ImportExport from "./pages/ImportExport";
 import NotFound from "./pages/NotFound";
 
@@ -43,46 +38,6 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Items />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/categories"
-              element={
-                <ProtectedRoute>
-                  <Categories />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/warehouses"
-              element={
-                <ProtectedRoute>
-                  <Warehouses />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/suppliers"
-              element={
-                <ProtectedRoute>
-                  <Suppliers />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/orders"
-              element={
-                <ProtectedRoute>
-                  <Orders />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/audit-logs"
-              element={
-                <ProtectedRoute allowedRoles={['admin', 'manager']}>
-                  <AuditLogs />
                 </ProtectedRoute>
               }
             />

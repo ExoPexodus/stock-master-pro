@@ -151,35 +151,6 @@ docker exec -it inventory_db psql -U inventory_user -d inventory_db
 docker exec -i inventory_db psql -U inventory_user -d inventory_db < db-init/init.sql
 ```
 
-## Seeding Mock Data
-
-To populate the database with sample data for testing:
-
-```bash
-# Using Docker (recommended)
-docker-compose exec backend python seed_data.py
-
-# Or locally if running backend without Docker
-cd backend
-python seed_data.py
-```
-
-This creates:
-- **3 users** with different roles (admin/manager/viewer)
-- **5+ categories** with subcategories
-- **4 suppliers** with contact information
-- **3 warehouses** with different capacities
-- **16+ items** across different categories
-- **Stock records** for all items in all warehouses
-- **10 purchase orders** with various statuses
-- **15 sales orders** from different customers
-- **50+ audit log entries**
-
-**Test Login Credentials:**
-- Admin: `admin` / `admin123`
-- Manager: `manager` / `manager123`
-- Viewer: `viewer` / `viewer123`
-
 ## Architecture Overview
 
 ```
