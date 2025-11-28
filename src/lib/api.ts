@@ -191,3 +191,12 @@ export const importsApi = {
   getJobStatus: (jobId: number) => api.get<any>(`/imports/jobs/${jobId}`),
   exportItems: () => api.downloadFile('/imports/export'),
 };
+
+// Custom Fields API
+export const customFieldsApi = {
+  getAll: () => api.get<any[]>('/custom-fields'),
+  create: (data: any) => api.post<any>('/custom-fields', data),
+  update: (id: number, data: any) => api.put<any>(`/custom-fields/${id}`, data),
+  delete: (id: number) => api.delete<any>(`/custom-fields/${id}`),
+  bulkUpdate: (fields: any[]) => api.post<any>('/custom-fields/bulk-update', { fields })
+};
