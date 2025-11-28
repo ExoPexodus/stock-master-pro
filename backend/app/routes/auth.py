@@ -48,7 +48,10 @@ def login():
         current_app.logger.error(f'❌ Login failed: Invalid credentials for {data["username"]}')
         return jsonify({'error': 'Invalid credentials'}), 401
     
-    access_token = create_access_token(identity={'id': user.id, 'role': user.role})
+    access_token = create_access_token(
+        identity=str(user.id),
+        additional_claims={'role': user.role}
+    )
     current_app.logger.info(f'✅ Login successful for {user.username}, token generated')
     
     return jsonify({
@@ -61,12 +64,12 @@ def login():
 @jwt_required()
 def get_current_user():
     current_app.logger.info('🔵 /me endpoint called')
-    identity = get_jwt_identity()
-    current_app.logger.info(f'🔵 JWT identity: {identity}')
-    user = User.query.get(identity['id'])
+    user_id = get_jwt_identity()
+    current_app.logger.info(f'🔵 JWT identity (user_id): {user_id}')
+    user = User.query.get(int(user_id))
     
     if not user:
-        current_app.logger.error(f'❌ User not found for id: {identity["id"]}')
+        current_app.logger.error(f'❌ User not found for id: {user_id}')
         return jsonify({'error': 'User not found'}), 404
     
     current_app.logger.info(f'✅ User found: {user.username}')
