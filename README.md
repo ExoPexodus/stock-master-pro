@@ -1,73 +1,178 @@
-# Welcome to your Lovable project
+# Inventory Management System
 
-## Project info
+A complete, production-ready, self-hosted inventory management web application with Flask backend and React frontend.
 
-**URL**: https://lovable.dev/projects/af9dc70e-0c89-453f-b2f9-4d7fe91eeae3
+## 🚀 Quick Start
 
-## How can I edit this code?
+```bash
+# 1. Configure environment
+cp backend/.env.example backend/.env
+cp .env.example .env
 
-There are several ways of editing your application.
+# 2. Start all services with Docker
+docker-compose up --build -d
 
-**Use Lovable**
+# 3. Access the application
+# Frontend: http://localhost:80
+# Backend API: http://localhost:5000
+```
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/af9dc70e-0c89-453f-b2f9-4d7fe91eeae3) and start prompting.
+**Default Admin Credentials:**
+- Username: `admin`
+- Password: `admin123` ⚠️ **CHANGE THIS IMMEDIATELY!**
 
-Changes made via Lovable will be committed automatically to this repo.
+## 📋 Features
 
-**Use your preferred IDE**
+### Core Functionality
+- ✅ Complete CRUD operations for Items, Categories, Warehouses, Suppliers
+- ✅ Stock level management with reorder thresholds
+- ✅ Real-time stock adjustments across multiple warehouses
+- ✅ Purchase orders and sales orders tracking
+- ✅ Goods received notes (GRN) management
+- ✅ Comprehensive audit logging
+- ✅ User activity tracking
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Import/Export System
+- ✅ CSV and Excel file imports with drag-and-drop
+- ✅ Column mapping and validation
+- ✅ Row-level error reporting
+- ✅ Hybrid processing (small files immediate, large files background)
+- ✅ Bulk insert and update operations
+- ✅ Import history with detailed logs
+- ✅ Excel export functionality
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Dashboard & Analytics
+- ✅ Real-time inventory statistics
+- ✅ Low stock alerts
+- ✅ Recent activity feed
+- ✅ Advanced filtering and global search
 
-Follow these steps:
+### Security & Access Control
+- ✅ JWT-based authentication
+- ✅ Role-based access control (Admin, Manager, Viewer)
+- ✅ Password hashing with werkzeug
+- ✅ API and UI-level permission enforcement
+
+## 🏗️ Architecture
+
+```
+Frontend (React + Vite + TypeScript)
+         ↓ REST API
+Backend (Flask + PostgreSQL + Celery + Redis)
+```
+
+**Frontend:** React 18, TypeScript, Vite, Tailwind CSS, shadcn/ui
+**Backend:** Flask 3.0, PostgreSQL, Celery, Redis, Pandas
+
+## 📖 Documentation
+
+- **[SETUP.md](SETUP.md)** - Detailed setup instructions including Celery/Redis
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Production deployment guide
+
+## 🔧 Local Development (with Lovable)
+
+This project is built with [Lovable](https://lovable.dev) for the frontend.
+
+### Frontend Development
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# Clone the repository
 git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
+# Install dependencies
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Visit http://localhost:5173 to see the frontend.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Backend Setup
 
-**Use GitHub Codespaces**
+See [SETUP.md](SETUP.md) for complete backend setup instructions.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Quick backend start:
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+python run.py
+```
 
-## What technologies are used for this project?
+## 📊 Tech Stack
 
-This project is built with:
+**Frontend:**
+- Vite - Fast build tool
+- TypeScript - Type safety
+- React - UI framework
+- shadcn-ui - Component library
+- Tailwind CSS - Styling
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+**Backend:**
+- Flask - Python web framework
+- PostgreSQL - Database
+- Celery - Background tasks
+- Redis - Message broker
 
-## How can I deploy this project?
+## 🚢 Deployment
 
-Simply open [Lovable](https://lovable.dev/projects/af9dc70e-0c89-453f-b2f9-4d7fe91eeae3) and click on Share -> Publish.
+**Option 1: Lovable Hosting (Frontend only)**
+Open [Lovable](https://lovable.dev/projects/af9dc70e-0c89-453f-b2f9-4d7fe91eeae3) and click Share -> Publish.
 
-## Can I connect a custom domain to my Lovable project?
+**Option 2: Self-Hosted (Full Stack)**
+Use Docker Compose to deploy everything:
+```bash
+docker-compose up --build -d
+```
 
-Yes, you can!
+See [DEPLOYMENT.md](DEPLOYMENT.md) for production deployment details.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 🎯 User Roles
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- **Admin**: Full system access including user management and deletions
+- **Manager**: CRUD operations, imports/exports, order management
+- **Viewer**: Read-only access to all data and reports
+
+## 📝 API Documentation
+
+Base URL: `http://localhost:5000/api`
+
+### Key Endpoints
+- `POST /auth/login` - Authentication
+- `GET /items` - List inventory items
+- `POST /imports/upload` - Import CSV/Excel
+- `GET /reports/dashboard` - Dashboard stats
+
+See backend route files in `backend/app/routes/` for complete API documentation.
+
+## 🐛 Troubleshooting
+
+Check [SETUP.md](SETUP.md) for detailed troubleshooting steps.
+
+Quick checks:
+```bash
+# View all logs
+docker-compose logs -f
+
+# Check specific service
+docker-compose logs backend
+docker-compose logs celery_worker
+```
+
+## 🤝 Contributing
+
+Feel free to fork and customize this project for your needs!
+
+## 📞 Support
+
+- **Setup Issues**: Check [SETUP.md](SETUP.md)
+- **Deployment Issues**: Check [DEPLOYMENT.md](DEPLOYMENT.md)
+- **Lovable Documentation**: https://docs.lovable.dev
+
+---
+
+**Built with ❤️ using Lovable + Flask**
