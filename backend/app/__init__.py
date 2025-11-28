@@ -60,6 +60,12 @@ def create_app():
         app.logger.info(f'🔵 Response: {response.status}')
         return response
     
+    # Global error handler
+    @app.errorhandler(Exception)
+    def handle_exception(e):
+        app.logger.error(f'❌ Unhandled exception: {str(e)}', exc_info=True)
+        return jsonify({'error': str(e), 'type': type(e).__name__}), 400
+    
     # CORS configuration
     cors_origins = os.getenv('CORS_ORIGINS', '*').split(',')
     CORS(app, 

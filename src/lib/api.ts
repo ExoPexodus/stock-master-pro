@@ -41,9 +41,10 @@ class ApiClient {
       console.error('❌ API Error:', {
         endpoint,
         status: response.status,
-        error
+        errorMessage: error.error || error.message || 'Unknown error',
+        fullError: error
       });
-      throw new Error(error.error || 'Request failed');
+      throw new Error(error.error || error.message || 'Request failed');
     }
 
     return response.json();
