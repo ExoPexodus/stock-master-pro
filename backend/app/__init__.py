@@ -31,6 +31,35 @@ def create_app():
     db.init_app(app)
     jwt.init_app(app)
     
+    # JWT error handlers
+    @jwt.invalid_token_loader
+    def invalid_token_callback(error_string):
+        app.logger.error(f'❌ Invalid JWT token: {error_string}')
+        return jsonify({'error': 'Invalid token', 'details': error_string}), 422
+    
+    @jwt.unauthorized_loader
+    def unauthorized_callback(error_string):
+        app.logger.error(f'❌ Missing JWT token: {error_string}')
+        return jsonify({'error': 'Missing authorization header', 'details': error_string}), 422
+    
+    @jwt.expired_token_loader
+    def expired_token_callback(jwt_header, jwt_payload):
+        app.logger.error(f'❌ Expired JWT token')
+        return jsonify({'error': 'Token has expired'}), 401
+    
+    # Request logging
+    @app.before_request
+    def log_request():
+        app.logger.info(f'🔵 {request.method} {request.path}')
+        app.logger.info(f'   Headers: {dict(request.headers)}')
+        if request.is_json:
+            app.logger.info(f'   Body: {request.get_json()}')
+    
+    @app.after_request
+    def log_response(response):
+        app.logger.info(f'🔵 Response: {response.status}')
+        return response
+    
     # CORS configuration
     cors_origins = os.getenv('CORS_ORIGINS', '*').split(',')
     CORS(app, 

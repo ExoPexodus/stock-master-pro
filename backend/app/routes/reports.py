@@ -1,5 +1,5 @@
-from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required
+from flask import Blueprint, request, jsonify, current_app
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from app import db
 from app.models import Item, Stock, AuditLog
 from sqlalchemy import func
@@ -9,6 +9,9 @@ bp = Blueprint('reports', __name__, url_prefix='/api/reports')
 @bp.route('/dashboard', methods=['GET'])
 @jwt_required()
 def get_dashboard():
+    current_app.logger.info('🔵 Dashboard endpoint called')
+    identity = get_jwt_identity()
+    current_app.logger.info(f'🔵 User identity: {identity}')
     total_items = Item.query.count()
     total_stock = db.session.query(func.sum(Stock.quantity)).scalar() or 0
     low_stock_items = db.session.query(Item).join(Stock).filter(

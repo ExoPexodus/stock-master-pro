@@ -16,13 +16,33 @@ class ApiClient {
       ...options.headers,
     };
 
+    console.log('🔵 API Request:', {
+      endpoint,
+      method: options.method || 'GET',
+      hasToken: !!token,
+      tokenPreview: token ? `${token.substring(0, 20)}...` : 'none',
+      headers: { ...headers, Authorization: token ? 'Bearer [hidden]' : 'none' }
+    });
+
     const response = await fetch(`${API_URL}${endpoint}`, {
       ...options,
       headers,
     });
 
+    console.log('🔵 API Response:', {
+      endpoint,
+      status: response.status,
+      statusText: response.statusText,
+      ok: response.ok
+    });
+
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: 'Request failed' }));
+      console.error('❌ API Error:', {
+        endpoint,
+        status: response.status,
+        error
+      });
       throw new Error(error.error || 'Request failed');
     }
 
