@@ -51,19 +51,32 @@ def create_app():
     @app.before_request
     def log_request():
         app.logger.info(f'🔵 {request.method} {request.path}')
-        app.logger.info(f'   Headers: {dict(request.headers)}')
+        # Log headers but hide sensitive data
+        headers = dict(request.headers)
+        if 'Authorization' in headers:
+            headers['Authorization'] = 'Bearer [REDACTED]'
+        app.logger.info(f'   Headers: {headers}')
+        # Don't consume the request body - just log if it exists
         if request.is_json:
-            app.logger.info(f'   Body: {request.get_json()}')
+            app.logger.info(f'   Has JSON body: True')
     
     @app.after_request
     def log_response(response):
         app.logger.info(f'🔵 Response: {response.status}')
         return response
     
-    # Global error handler
+    # Global error handler (but don't catch JWT errors)
     @app.errorhandler(Exception)
     def handle_exception(e):
+        # Don't catch JWT-related errors - let JWT error handlers deal with them
+        from jwt.exceptions import PyJWTError
+        if isinstance(e, PyJWTError):
+            app.logger.error(f'❌ JWT Error (will be handled by JWT handler): {str(e)}', exc_info=True)
+            raise e
+        
         app.logger.error(f'❌ Unhandled exception: {str(e)}', exc_info=True)
+        app.logger.error(f'   Exception type: {type(e).__name__}')
+        app.logger.error(f'   Exception details: {repr(e)}')
         return jsonify({'error': str(e), 'type': type(e).__name__}), 400
     
     # CORS configuration
