@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app import db
 from app.models import Item, Stock, AuditLog
@@ -9,6 +9,9 @@ bp = Blueprint('items', __name__, url_prefix='/api/items')
 @bp.route('/', methods=['GET'])
 @jwt_required()
 def get_items():
+    current_app.logger.info('🔵 Get items endpoint called')
+    identity = get_jwt_identity()
+    current_app.logger.info(f'🔵 User identity: {identity}')
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 20, type=int)
     search = request.args.get('search', '')
