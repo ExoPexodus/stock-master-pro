@@ -91,3 +91,82 @@ class ApiClient {
 }
 
 export const api = new ApiClient();
+
+// Auth API
+export const authApi = {
+  login: (username: string, password: string) =>
+    api.post<{ access_token: string; user: any }>('/auth/login', { username, password }),
+  register: (data: { username: string; email: string; password: string; role?: string }) =>
+    api.post<{ message: string }>('/auth/register', data),
+  getCurrentUser: () => api.get<any>('/auth/me'),
+};
+
+// Items API
+export const itemsApi = {
+  getAll: (params?: { page?: number; per_page?: number; search?: string }) =>
+    api.get<any>(`/items?${new URLSearchParams(params as any).toString()}`),
+  getById: (id: number) => api.get<any>(`/items/${id}`),
+  create: (data: any) => api.post<any>('/items', data),
+  update: (id: number, data: any) => api.put<any>(`/items/${id}`, data),
+  delete: (id: number) => api.delete<any>(`/items/${id}`),
+  adjustStock: (id: number, data: { warehouse_id: number; quantity: number; adjustment_type: string }) =>
+    api.post<any>(`/items/${id}/stock-adjustment`, data),
+};
+
+// Categories API
+export const categoriesApi = {
+  getAll: () => api.get<any[]>('/categories'),
+  getById: (id: number) => api.get<any>(`/categories/${id}`),
+  create: (data: { name: string; description?: string; parent_id?: number }) =>
+    api.post<any>('/categories', data),
+  update: (id: number, data: any) => api.put<any>(`/categories/${id}`, data),
+  delete: (id: number) => api.delete<any>(`/categories/${id}`),
+};
+
+// Warehouses API
+export const warehousesApi = {
+  getAll: () => api.get<any[]>('/warehouses'),
+  getById: (id: number) => api.get<any>(`/warehouses/${id}`),
+  create: (data: { name: string; location?: string; capacity?: number }) =>
+    api.post<any>('/warehouses', data),
+  update: (id: number, data: any) => api.put<any>(`/warehouses/${id}`, data),
+  delete: (id: number) => api.delete<any>(`/warehouses/${id}`),
+};
+
+// Suppliers API
+export const suppliersApi = {
+  getAll: () => api.get<any[]>('/suppliers'),
+  getById: (id: number) => api.get<any>(`/suppliers/${id}`),
+  create: (data: { name: string; contact_person?: string; email?: string; phone?: string; address?: string }) =>
+    api.post<any>('/suppliers', data),
+  update: (id: number, data: any) => api.put<any>(`/suppliers/${id}`, data),
+  delete: (id: number) => api.delete<any>(`/suppliers/${id}`),
+};
+
+// Orders API
+export const ordersApi = {
+  getPurchaseOrders: () => api.get<any[]>('/orders/purchase'),
+  getPurchaseOrderById: (id: number) => api.get<any>(`/orders/purchase/${id}`),
+  createPurchaseOrder: (data: any) => api.post<any>('/orders/purchase', data),
+  getSalesOrders: () => api.get<any[]>('/orders/sales'),
+  getSalesOrderById: (id: number) => api.get<any>(`/orders/sales/${id}`),
+  createSalesOrder: (data: any) => api.post<any>('/orders/sales', data),
+};
+
+// Reports API
+export const reportsApi = {
+  getDashboard: () => api.get<any>('/reports/dashboard'),
+  getLowStock: (threshold?: number) =>
+    api.get<any[]>(`/reports/low-stock${threshold ? `?threshold=${threshold}` : ''}`),
+  getAuditLogs: (params?: { page?: number; per_page?: number }) =>
+    api.get<any>(`/reports/audit-logs?${new URLSearchParams(params as any).toString()}`),
+};
+
+// Imports API
+export const importsApi = {
+  uploadFile: (file: File) => api.uploadFile<any>('/imports/upload', file),
+  getJobs: (params?: { page?: number; per_page?: number }) =>
+    api.get<any>(`/imports/jobs?${new URLSearchParams(params as any).toString()}`),
+  getJobStatus: (jobId: number) => api.get<any>(`/imports/jobs/${jobId}`),
+  exportItems: () => api.downloadFile('/imports/export'),
+};

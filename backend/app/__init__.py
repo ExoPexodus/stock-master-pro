@@ -27,7 +27,14 @@ def create_app():
     
     # CORS configuration
     cors_origins = os.getenv('CORS_ORIGINS', '*').split(',')
-    CORS(app, resources={r"/api/*": {"origins": cors_origins}})
+    CORS(app, resources={
+        r"/api/*": {
+            "origins": cors_origins,
+            "supports_credentials": True,
+            "allow_headers": ["Content-Type", "Authorization"],
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+        }
+    })
     
     # Register blueprints
     from app.routes import auth, items, categories, warehouses, suppliers, orders, reports, imports
