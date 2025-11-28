@@ -42,7 +42,7 @@ def create_category():
     db.session.commit()
     
     log = AuditLog(
-        user_id=identity['id'],
+        user_id=int(identity),
         action='CREATE',
         entity_type='Category',
         entity_id=category.id,
@@ -72,7 +72,7 @@ def update_category(category_id):
     db.session.commit()
     
     log = AuditLog(
-        user_id=identity['id'],
+        user_id=int(identity),
         action='UPDATE',
         entity_type='Category',
         entity_id=category.id,
@@ -92,7 +92,7 @@ def delete_category(category_id):
     identity = get_jwt_identity()
     
     log = AuditLog(
-        user_id=identity['id'],
+        user_id=int(identity),
         action='DELETE',
         entity_type='Category',
         entity_id=category.id,
