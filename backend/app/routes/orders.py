@@ -38,14 +38,14 @@ def create_purchase_order():
         status=data.get('status', 'pending'),
         expected_date=data.get('expected_date'),
         total_amount=data.get('total_amount'),
-        created_by=identity['id']
+        created_by=int(identity)
     )
     
     db.session.add(order)
     db.session.commit()
     
     log = AuditLog(
-        user_id=identity['id'],
+        user_id=int(identity),
         action='CREATE',
         entity_type='PurchaseOrder',
         entity_id=order.id,
@@ -88,14 +88,14 @@ def create_sales_order():
         warehouse_id=data['warehouse_id'],
         status=data.get('status', 'pending'),
         total_amount=data.get('total_amount'),
-        created_by=identity['id']
+        created_by=int(identity)
     )
     
     db.session.add(order)
     db.session.commit()
     
     log = AuditLog(
-        user_id=identity['id'],
+        user_id=int(identity),
         action='CREATE',
         entity_type='SalesOrder',
         entity_id=order.id,

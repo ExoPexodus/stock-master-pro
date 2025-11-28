@@ -74,7 +74,7 @@ def create_item():
     
     # Log the action
     log = AuditLog(
-        user_id=identity['id'],
+        user_id=int(identity),
         action='CREATE',
         entity_type='Item',
         entity_id=item.id,
@@ -109,7 +109,7 @@ def update_item(item_id):
     
     # Log the action
     log = AuditLog(
-        user_id=identity['id'],
+        user_id=int(identity),
         action='UPDATE',
         entity_type='Item',
         entity_id=item.id,
@@ -130,7 +130,7 @@ def delete_item(item_id):
     
     # Log before deletion
     log = AuditLog(
-        user_id=identity['id'],
+        user_id=int(identity),
         action='DELETE',
         entity_type='Item',
         entity_id=item.id,
@@ -176,7 +176,7 @@ def adjust_stock(item_id):
     
     # Log the action
     log = AuditLog(
-        user_id=identity['id'],
+        user_id=int(identity),
         action='STOCK_ADJUSTMENT',
         entity_type='Stock',
         entity_id=stock.id,

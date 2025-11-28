@@ -42,7 +42,7 @@ def create_supplier():
     db.session.commit()
     
     log = AuditLog(
-        user_id=identity['id'],
+        user_id=int(identity),
         action='CREATE',
         entity_type='Supplier',
         entity_id=supplier.id,
@@ -76,7 +76,7 @@ def update_supplier(supplier_id):
     db.session.commit()
     
     log = AuditLog(
-        user_id=identity['id'],
+        user_id=int(identity),
         action='UPDATE',
         entity_type='Supplier',
         entity_id=supplier.id,
@@ -96,7 +96,7 @@ def delete_supplier(supplier_id):
     identity = get_jwt_identity()
     
     log = AuditLog(
-        user_id=identity['id'],
+        user_id=int(identity),
         action='DELETE',
         entity_type='Supplier',
         entity_id=supplier.id,

@@ -45,7 +45,7 @@ def create_warehouse():
     db.session.commit()
     
     log = AuditLog(
-        user_id=identity['id'],
+        user_id=int(identity),
         action='CREATE',
         entity_type='Warehouse',
         entity_id=warehouse.id,
@@ -75,7 +75,7 @@ def update_warehouse(warehouse_id):
     db.session.commit()
     
     log = AuditLog(
-        user_id=identity['id'],
+        user_id=int(identity),
         action='UPDATE',
         entity_type='Warehouse',
         entity_id=warehouse.id,
@@ -95,7 +95,7 @@ def delete_warehouse(warehouse_id):
     identity = get_jwt_identity()
     
     log = AuditLog(
-        user_id=identity['id'],
+        user_id=int(identity),
         action='DELETE',
         entity_type='Warehouse',
         entity_id=warehouse.id,
