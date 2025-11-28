@@ -90,7 +90,7 @@ def create_app():
     )
     
     # Register blueprints
-    from app.routes import auth, items, categories, warehouses, suppliers, orders, reports, imports, custom_fields
+    from app.routes import auth, items, categories, warehouses, suppliers, orders, reports, imports
     
     app.register_blueprint(auth.bp)
     app.register_blueprint(items.bp)
@@ -98,9 +98,6 @@ def create_app():
     app.register_blueprint(warehouses.bp)
     app.register_blueprint(suppliers.bp)
     app.register_blueprint(orders.bp)
-    app.register_blueprint(reports.bp)
-    app.register_blueprint(imports.bp)
-    app.register_blueprint(custom_fields.bp)
     app.register_blueprint(reports.bp)
     app.register_blueprint(imports.bp)
     

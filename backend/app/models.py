@@ -101,14 +101,13 @@ class Item(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
     unit_price = db.Column(db.Numeric(10, 2), nullable=False)
     reorder_level = db.Column(db.Integer, default=10)
-    custom_data = db.Column(db.JSON, default={})
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     category = db.relationship('Category', backref='items')
     
     def to_dict(self):
-        result = {
+        return {
             'id': self.id,
             'sku': self.sku,
             'name': self.name,
@@ -119,10 +118,6 @@ class Item(db.Model):
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }
-        # Include custom_data fields
-        if self.custom_data:
-            result['custom_data'] = self.custom_data
-        return result
 
 
 class Stock(db.Model):
@@ -257,33 +252,4 @@ class ImportJob(db.Model):
             'created_by': self.created_by,
             'created_at': self.created_at.isoformat(),
             'completed_at': self.completed_at.isoformat() if self.completed_at else None
-        }
-
-
-class CustomField(db.Model):
-    __tablename__ = 'custom_fields'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    field_key = db.Column(db.String(100), unique=True, nullable=False)
-    field_label = db.Column(db.String(200), nullable=False)
-    field_type = db.Column(db.String(50), default='text')  # text, number, date, boolean
-    field_group = db.Column(db.String(100))  # e.g., "Specifications", "Packaging"
-    visible_in_form = db.Column(db.Boolean, default=True)
-    visible_in_table = db.Column(db.Boolean, default=False)
-    default_value = db.Column(db.String(255))
-    sort_order = db.Column(db.Integer, default=0)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'field_key': self.field_key,
-            'field_label': self.field_label,
-            'field_type': self.field_type,
-            'field_group': self.field_group,
-            'visible_in_form': self.visible_in_form,
-            'visible_in_table': self.visible_in_table,
-            'default_value': self.default_value,
-            'sort_order': self.sort_order,
-            'created_at': self.created_at.isoformat()
         }

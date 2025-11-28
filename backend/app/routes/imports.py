@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.utils import secure_filename
 import os
 from app import db
-from app.models import ImportJob, Item, CustomField
+from app.models import ImportJob, Item
 from app.utils.decorators import role_required
 from app.tasks import process_import_file
 
@@ -43,7 +43,7 @@ def upload_file():
     import_job = ImportJob(
         filename=filename,
         status='pending',
-        created_by=int(identity)
+        created_by=identity['id']
     )
     db.session.add(import_job)
     db.session.commit()
@@ -111,15 +111,7 @@ def export_items():
     from flask import send_file
     
     items = Item.query.all()
-    data = []
-    
-    for item in items:
-        row = item.to_dict()
-        # Flatten custom_data fields into separate columns
-        if 'custom_data' in row and row['custom_data']:
-            custom_data = row.pop('custom_data')
-            row.update(custom_data)
-        data.append(row)
+    data = [item.to_dict() for item in items]
     
     df = pd.DataFrame(data)
     

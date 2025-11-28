@@ -45,7 +45,6 @@ export interface Item {
   category_id?: number;
   unit_price: number;
   reorder_level: number;
-  custom_data?: Record<string, any>;
   created_at: string;
   updated_at: string;
   stock?: Stock[];
