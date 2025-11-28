@@ -101,8 +101,6 @@ def create_app():
     app.register_blueprint(reports.bp)
     app.register_blueprint(imports.bp)
     app.register_blueprint(custom_fields.bp)
-    app.register_blueprint(reports.bp)
-    app.register_blueprint(imports.bp)
     
     # Create tables
     with app.app_context():
