@@ -66,7 +66,8 @@ def create_item():
         description=data.get('description'),
         category_id=data.get('category_id'),
         unit_price=data['unit_price'],
-        reorder_level=data.get('reorder_level', 10)
+        reorder_level=data.get('reorder_level', 10),
+        custom_data=data.get('custom_data', {})
     )
     
     db.session.add(item)
@@ -104,6 +105,8 @@ def update_item(item_id):
         item.unit_price = data['unit_price']
     if 'reorder_level' in data:
         item.reorder_level = data['reorder_level']
+    if 'custom_data' in data:
+        item.custom_data = data['custom_data']
     
     db.session.commit()
     

@@ -7,6 +7,7 @@ import {
   ShoppingCart, 
   FileText,
   Upload,
+  Settings,
   LogOut
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
@@ -35,6 +36,7 @@ const items = [
   { title: 'Orders', url: '/orders', icon: ShoppingCart, roles: ['admin', 'manager', 'viewer'] },
   { title: 'Audit Logs', url: '/audit-logs', icon: FileText, roles: ['admin', 'manager'] },
   { title: 'Import/Export', url: '/import', icon: Upload, roles: ['admin', 'manager'] },
+  { title: 'Field Manager', url: '/field-manager', icon: Settings, roles: ['admin', 'manager'] },
 ];
 
 export function AppSidebar() {
