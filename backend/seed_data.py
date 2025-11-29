@@ -201,53 +201,53 @@ def seed_database():
         # Create Items (with warehouse_id and supplier_id)
         print("Creating items...")
         items_data = [
-            # Electronics
-            ('LAP-001', 'Dell Latitude 5520', 'Business laptop with Intel i7, 16GB RAM, 512GB SSD', categories[0].id, 1299.99, 10, 12, None),
-            ('LAP-002', 'HP EliteBook 840', 'Premium business laptop with AMD Ryzen 7', categories[0].id, 1499.99, 8, 12, None),
-            ('LAP-003', 'Lenovo ThinkPad X1', 'Ultra-portable business laptop', categories[0].id, 1799.99, 5, 12, None),
-            ('MON-001', 'Dell UltraSharp 27"', '4K monitor with USB-C hub', categories[0].id, 599.99, 15, 24, None),
-            ('MON-002', 'LG 24" Monitor', 'Full HD IPS display', categories[0].id, 249.99, 20, 24, None),
-            ('MON-003', 'Samsung Curved 32"', 'Ultra-wide curved display', categories[0].id, 899.99, 10, 24, None),
-            ('KEY-001', 'Mechanical Keyboard', 'RGB mechanical gaming keyboard', categories[0].id, 129.99, 30, 12, None),
-            ('MOU-001', 'Wireless Mouse', 'Ergonomic wireless mouse', categories[0].id, 49.99, 50, 12, None),
+            # Electronics (prices in INR)
+            ('LAP-001', 'Dell Latitude 5520', 'Business laptop with Intel i7, 16GB RAM, 512GB SSD', categories[0].id, 107999, 10, 12, None),
+            ('LAP-002', 'HP EliteBook 840', 'Premium business laptop with AMD Ryzen 7', categories[0].id, 124499, 8, 12, None),
+            ('LAP-003', 'Lenovo ThinkPad X1', 'Ultra-portable business laptop', categories[0].id, 149399, 5, 12, None),
+            ('MON-001', 'Dell UltraSharp 27"', '4K monitor with USB-C hub', categories[0].id, 49799, 15, 24, None),
+            ('MON-002', 'LG 24" Monitor', 'Full HD IPS display', categories[0].id, 20749, 20, 24, None),
+            ('MON-003', 'Samsung Curved 32"', 'Ultra-wide curved display', categories[0].id, 74699, 10, 24, None),
+            ('KEY-001', 'Mechanical Keyboard', 'RGB mechanical gaming keyboard', categories[0].id, 10789, 30, 12, None),
+            ('MOU-001', 'Wireless Mouse', 'Ergonomic wireless mouse', categories[0].id, 4149, 50, 12, None),
             
-            # Furniture
-            ('DSK-001', 'Executive Desk Oak', 'Solid oak executive desk 72x36', categories[1].id, 899.99, 5, None, None),
-            ('DSK-002', 'Standing Desk Electric', 'Height adjustable electric desk', categories[1].id, 699.99, 12, None, None),
-            ('DSK-003', 'Corner Desk L-Shape', 'Space-saving corner desk', categories[1].id, 449.99, 8, None, None),
-            ('CHR-001', 'Ergonomic Office Chair', 'Mesh back ergonomic chair', categories[1].id, 399.99, 25, None, None),
-            ('CHR-002', 'Executive Leather Chair', 'Premium leather executive chair', categories[1].id, 799.99, 8, None, None),
-            ('CHR-003', 'Task Chair Basic', 'Affordable task chair', categories[1].id, 149.99, 40, None, None),
-            ('CAB-001', 'Filing Cabinet 4-Drawer', 'Lockable metal filing cabinet', categories[1].id, 299.99, 15, None, None),
+            # Furniture (prices in INR)
+            ('DSK-001', 'Executive Desk Oak', 'Solid oak executive desk 72x36', categories[1].id, 74699, 5, None, None),
+            ('DSK-002', 'Standing Desk Electric', 'Height adjustable electric desk', categories[1].id, 58099, 12, None, None),
+            ('DSK-003', 'Corner Desk L-Shape', 'Space-saving corner desk', categories[1].id, 37349, 8, None, None),
+            ('CHR-001', 'Ergonomic Office Chair', 'Mesh back ergonomic chair', categories[1].id, 33199, 25, None, None),
+            ('CHR-002', 'Executive Leather Chair', 'Premium leather executive chair', categories[1].id, 66399, 8, None, None),
+            ('CHR-003', 'Task Chair Basic', 'Affordable task chair', categories[1].id, 12449, 40, None, None),
+            ('CAB-001', 'Filing Cabinet 4-Drawer', 'Lockable metal filing cabinet', categories[1].id, 24899, 15, None, None),
             
-            # Stationery
-            ('PEN-001', 'Ballpoint Pens Box', 'Box of 50 blue pens', categories[2].id, 12.99, 100, None, None),
-            ('PEN-002', 'Marker Set', 'Pack of 12 permanent markers', categories[2].id, 18.99, 80, None, None),
-            ('PAP-001', 'A4 Paper Ream', '500 sheets premium white paper', categories[2].id, 8.99, 200, None, None),
-            ('PAP-002', 'Color Paper Pack', 'Assorted colors, 250 sheets', categories[2].id, 15.99, 120, None, None),
-            ('NOT-001', 'Spiral Notebooks', 'Pack of 5 college-ruled notebooks', categories[2].id, 15.99, 150, None, None),
-            ('FOL-001', 'File Folders Box', 'Box of 100 manila folders', categories[2].id, 24.99, 60, None, None),
+            # Stationery (prices in INR)
+            ('PEN-001', 'Ballpoint Pens Box', 'Box of 50 blue pens', categories[2].id, 1079, 100, None, None),
+            ('PEN-002', 'Marker Set', 'Pack of 12 permanent markers', categories[2].id, 1576, 80, None, None),
+            ('PAP-001', 'A4 Paper Ream', '500 sheets premium white paper', categories[2].id, 746, 200, None, None),
+            ('PAP-002', 'Color Paper Pack', 'Assorted colors, 250 sheets', categories[2].id, 1327, 120, None, None),
+            ('NOT-001', 'Spiral Notebooks', 'Pack of 5 college-ruled notebooks', categories[2].id, 1327, 150, None, None),
+            ('FOL-001', 'File Folders Box', 'Box of 100 manila folders', categories[2].id, 2074, 60, None, None),
             
-            # Hardware
-            ('DRL-001', 'Cordless Drill Kit', '20V cordless drill with bits and case', categories[3].id, 149.99, 30, None, None),
-            ('DRL-002', 'Impact Driver', '18V impact driver kit', categories[3].id, 129.99, 25, None, None),
-            ('HMR-001', 'Claw Hammer', 'Steel claw hammer 16oz', categories[3].id, 24.99, 50, None, None),
-            ('SCR-001', 'Screwdriver Set', '10-piece precision screwdriver set', categories[3].id, 34.99, 40, None, None),
-            ('WRN-001', 'Socket Wrench Set', '42-piece socket set with case', categories[3].id, 89.99, 20, None, None),
-            ('LEV-001', 'Laser Level', 'Self-leveling laser level', categories[3].id, 79.99, 15, None, None),
+            # Hardware (prices in INR)
+            ('DRL-001', 'Cordless Drill Kit', '20V cordless drill with bits and case', categories[3].id, 12449, 30, None, None),
+            ('DRL-002', 'Impact Driver', '18V impact driver kit', categories[3].id, 10789, 25, None, None),
+            ('HMR-001', 'Claw Hammer', 'Steel claw hammer 16oz', categories[3].id, 2074, 50, None, None),
+            ('SCR-001', 'Screwdriver Set', '10-piece precision screwdriver set', categories[3].id, 2904, 40, None, None),
+            ('WRN-001', 'Socket Wrench Set', '42-piece socket set with case', categories[3].id, 7469, 20, None, None),
+            ('LEV-001', 'Laser Level', 'Self-leveling laser level', categories[3].id, 6639, 15, None, None),
             
-            # Consumables
-            ('CLN-001', 'Cleaning Spray', 'Multi-surface cleaner 500ml', categories[4].id, 6.99, 300, None, date(2025, 12, 31)),
-            ('CLN-002', 'Disinfectant Wipes', 'Container of 75 wipes', categories[4].id, 8.99, 250, None, date(2025, 10, 15)),
-            ('TOW-001', 'Paper Towels', 'Pack of 12 rolls', categories[4].id, 19.99, 250, None, None),
-            ('GLV-001', 'Disposable Gloves', 'Box of 100 latex gloves', categories[4].id, 14.99, 200, None, date(2026, 6, 30)),
-            ('BAT-001', 'AA Batteries', 'Pack of 24 alkaline batteries', categories[4].id, 16.99, 180, None, date(2028, 3, 15)),
+            # Consumables (prices in INR)
+            ('CLN-001', 'Cleaning Spray', 'Multi-surface cleaner 500ml', categories[4].id, 580, 300, None, date(2025, 12, 31)),
+            ('CLN-002', 'Disinfectant Wipes', 'Container of 75 wipes', categories[4].id, 746, 250, None, date(2025, 10, 15)),
+            ('TOW-001', 'Paper Towels', 'Pack of 12 rolls', categories[4].id, 1659, 250, None, None),
+            ('GLV-001', 'Disposable Gloves', 'Box of 100 latex gloves', categories[4].id, 1244, 200, None, date(2026, 6, 30)),
+            ('BAT-001', 'AA Batteries', 'Pack of 24 alkaline batteries', categories[4].id, 1410, 180, None, date(2028, 3, 15)),
             
-            # Safety Equipment
-            ('HLM-001', 'Hard Hat', 'ANSI approved safety helmet', categories[5].id, 29.99, 50, None, None),
-            ('VES-001', 'Safety Vest', 'High-visibility reflective vest', categories[5].id, 19.99, 60, None, None),
-            ('GLV-002', 'Work Gloves', 'Cut-resistant work gloves', categories[5].id, 24.99, 80, None, None),
-            ('GOG-001', 'Safety Goggles', 'Anti-fog safety goggles', categories[5].id, 15.99, 70, None, None),
+            # Safety Equipment (prices in INR)
+            ('HLM-001', 'Hard Hat', 'ANSI approved safety helmet', categories[5].id, 2489, 50, None, None),
+            ('VES-001', 'Safety Vest', 'High-visibility reflective vest', categories[5].id, 1659, 60, None, None),
+            ('GLV-002', 'Work Gloves', 'Cut-resistant work gloves', categories[5].id, 2074, 80, None, None),
+            ('GOG-001', 'Safety Goggles', 'Anti-fog safety goggles', categories[5].id, 1327, 70, None, None),
         ]
         
         items = []
@@ -348,7 +348,7 @@ def seed_database():
                 status=status,
                 order_date=order_date,
                 expected_date=order_date + timedelta(days=random.randint(7, 30)),
-                total_amount=round(random.uniform(500, 10000), 2),
+                total_amount=round(random.uniform(41500, 830000), 2),
                 created_by=users[0].id if i % 2 == 0 else users[1].id,
                 expected_delivery_date=date.today() + timedelta(days=random.randint(5, 25)),
                 comments=f'Purchase order #{i+1}'
@@ -433,7 +433,7 @@ def seed_database():
                 warehouse_id=random.choice(warehouses).id,
                 status=random.choice(so_statuses),
                 order_date=datetime.utcnow() - timedelta(days=random.randint(1, 60)),
-                total_amount=round(random.uniform(200, 5000), 2),
+                total_amount=round(random.uniform(16600, 415000), 2),
                 created_by=users[1].id if i % 2 == 0 else users[3].id
             )
             sales_orders.append(so)

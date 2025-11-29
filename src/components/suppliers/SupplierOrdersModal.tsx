@@ -103,7 +103,7 @@ export function SupplierOrdersModal({ supplierId, supplierName, isOpen, onClose 
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    ${data?.statistics?.total_amount?.toLocaleString() || 0}
+                    ₹{data?.statistics?.total_amount?.toLocaleString() || 0}
                   </div>
                 </CardContent>
               </Card>
@@ -170,7 +170,7 @@ export function SupplierOrdersModal({ supplierId, supplierName, isOpen, onClose 
                           <TableCell>{getStatusBadge(order.status)}</TableCell>
                           <TableCell>{order.warehouse?.name || '-'}</TableCell>
                           <TableCell className="text-right font-medium">
-                            ${parseFloat(order.total_amount || 0).toLocaleString()}
+                            ₹{parseFloat(order.total_amount || 0).toLocaleString()}
                           </TableCell>
                           <TableCell>
                             {order.delivered_date ? format(new Date(order.delivered_date), 'MMM dd, yyyy') : '-'}
