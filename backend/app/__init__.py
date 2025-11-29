@@ -109,7 +109,6 @@ def create_app():
     with app.app_context():
         try:
             from flask_migrate import upgrade, current
-            import os
             
             # Check if migrations directory is initialized
             migrations_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'migrations')
