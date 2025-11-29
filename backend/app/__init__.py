@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
+from flask_migrate import Migrate
 from dotenv import load_dotenv
 import os
 
@@ -9,6 +10,7 @@ load_dotenv()
 
 db = SQLAlchemy()
 jwt = JWTManager()
+migrate = Migrate()
 
 def create_app():
     app = Flask(__name__)
@@ -30,6 +32,7 @@ def create_app():
     # Initialize extensions
     db.init_app(app)
     jwt.init_app(app)
+    migrate.init_app(app, db)
     
     # JWT error handlers
     @jwt.invalid_token_loader
@@ -102,8 +105,14 @@ def create_app():
     app.register_blueprint(imports.bp)
     app.register_blueprint(notifications.bp)
     
-    # Create tables
+    # Run migrations automatically on startup
     with app.app_context():
-        db.create_all()
+        from flask_migrate import upgrade
+        try:
+            upgrade()
+            app.logger.info('✅ Database migrations applied successfully')
+        except Exception as e:
+            app.logger.warning(f'⚠️ Migration warning: {str(e)}')
+            # Don't fail startup if migrations have issues
     
     return app
