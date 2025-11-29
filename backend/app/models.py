@@ -101,6 +101,8 @@ class Item(db.Model):
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
     unit_price = db.Column(db.Numeric(10, 2), nullable=False)
     reorder_level = db.Column(db.Integer, default=10)
+    warranty_months = db.Column(db.Integer)
+    expiry_date = db.Column(db.Date)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -115,6 +117,8 @@ class Item(db.Model):
             'category_id': self.category_id,
             'unit_price': float(self.unit_price),
             'reorder_level': self.reorder_level,
+            'warranty_months': self.warranty_months,
+            'expiry_date': self.expiry_date.isoformat() if self.expiry_date else None,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }
@@ -162,10 +166,15 @@ class PurchaseOrder(db.Model):
     rejected_date = db.Column(db.DateTime)
     sent_date = db.Column(db.DateTime)
     delivered_date = db.Column(db.DateTime)
+    expected_delivery_date = db.Column(db.Date)
+    actual_delivery_date = db.Column(db.Date)
     comments = db.Column(db.Text)
     
     supplier = db.relationship('Supplier', backref='purchase_orders')
     warehouse = db.relationship('Warehouse', backref='purchase_orders')
+    created_by_user = db.relationship('User', foreign_keys=[created_by], backref='created_purchase_orders')
+    approved_by_user = db.relationship('User', foreign_keys=[approved_by], backref='approved_purchase_orders')
+    rejected_by_user = db.relationship('User', foreign_keys=[rejected_by], backref='rejected_purchase_orders')
     
     def to_dict(self):
         return {
@@ -184,8 +193,38 @@ class PurchaseOrder(db.Model):
             'rejected_date': self.rejected_date.isoformat() if self.rejected_date else None,
             'sent_date': self.sent_date.isoformat() if self.sent_date else None,
             'delivered_date': self.delivered_date.isoformat() if self.delivered_date else None,
-            'comments': self.comments
+            'expected_delivery_date': self.expected_delivery_date.isoformat() if self.expected_delivery_date else None,
+            'actual_delivery_date': self.actual_delivery_date.isoformat() if self.actual_delivery_date else None,
+            'comments': self.comments,
+            'lead_time_metrics': self.calculate_lead_times()
         }
+    
+    def calculate_lead_times(self):
+        """Calculate lead time metrics for the order"""
+        metrics = {
+            'approval_days': None,
+            'send_days': None,
+            'delivery_days': None,
+            'total_days': None,
+            'variance_days': None
+        }
+        
+        if self.approved_date and self.order_date:
+            metrics['approval_days'] = (self.approved_date.date() - self.order_date.date()).days
+        
+        if self.sent_date and self.approved_date:
+            metrics['send_days'] = (self.sent_date.date() - self.approved_date.date()).days
+        
+        if self.delivered_date and self.sent_date:
+            metrics['delivery_days'] = (self.delivered_date.date() - self.sent_date.date()).days
+        
+        if self.delivered_date and self.order_date:
+            metrics['total_days'] = (self.delivered_date.date() - self.order_date.date()).days
+        
+        if self.actual_delivery_date and self.expected_delivery_date:
+            metrics['variance_days'] = (self.actual_delivery_date - self.expected_delivery_date).days
+        
+        return metrics
 
 
 class SalesOrder(db.Model):

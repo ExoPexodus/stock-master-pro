@@ -45,6 +45,8 @@ export interface Item {
   category_id?: number;
   unit_price: number;
   reorder_level: number;
+  warranty_months?: number;
+  expiry_date?: string;
   created_at: string;
   updated_at: string;
   stock?: Stock[];
@@ -74,7 +76,16 @@ export interface PurchaseOrder {
   rejected_date?: string;
   sent_date?: string;
   delivered_date?: string;
+  expected_delivery_date?: string;
+  actual_delivery_date?: string;
   comments?: string;
+  lead_time_metrics?: {
+    approval_days: number | null;
+    send_days: number | null;
+    delivery_days: number | null;
+    total_days: number | null;
+    variance_days: number | null;
+  };
 }
 
 export interface ApprovalHistory {
