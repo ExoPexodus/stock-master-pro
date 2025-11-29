@@ -107,10 +107,28 @@ def create_app():
     
     # Run migrations automatically on startup
     with app.app_context():
-        from flask_migrate import upgrade
         try:
-            upgrade()
-            app.logger.info('✅ Database migrations applied successfully')
+            from flask_migrate import upgrade, current
+            import os
+            
+            # Check if migrations directory is initialized
+            migrations_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'migrations')
+            versions_dir = os.path.join(migrations_dir, 'versions')
+            
+            if os.path.exists(versions_dir):
+                # Try to get current revision
+                try:
+                    current()
+                    app.logger.info('📊 Checking for database migrations...')
+                except Exception:
+                    app.logger.info('🔧 Initializing migration tracking...')
+                
+                # Apply any pending migrations
+                upgrade()
+                app.logger.info('✅ Database migrations applied successfully')
+            else:
+                app.logger.warning('⚠️ Migrations directory not found, skipping auto-migration')
+                
         except Exception as e:
             app.logger.warning(f'⚠️ Migration warning: {str(e)}')
             # Don't fail startup if migrations have issues

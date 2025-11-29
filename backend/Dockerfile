@@ -22,4 +22,5 @@ RUN mkdir -p /tmp/uploads
 EXPOSE 5000
 
 # Run the application
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--timeout", "120", "run:app"]
+# Initialize migrations and start server
+CMD python init_migrations.py && gunicorn --bind 0.0.0.0:5000 --workers 4 --timeout 120 run:app
