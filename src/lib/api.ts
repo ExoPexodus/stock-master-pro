@@ -162,6 +162,8 @@ export const suppliersApi = {
     api.post<any>('/suppliers', data),
   update: (id: number, data: any) => api.put<any>(`/suppliers/${id}`, data),
   delete: (id: number) => api.delete<any>(`/suppliers/${id}`),
+  getOrders: (id: number) => api.get<any>(`/suppliers/${id}/orders`),
+  exportOrders: (id: number) => api.downloadFile(`/suppliers/${id}/orders/export`),
 };
 
 // Orders API
