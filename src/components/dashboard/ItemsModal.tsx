@@ -102,7 +102,7 @@ export const ItemsModal = ({ isOpen, onClose }: ItemsModalProps) => {
                   <TableRow key={item.id}>
                     <TableCell className="font-mono">{item.sku}</TableCell>
                     <TableCell>{item.name}</TableCell>
-                    <TableCell>${item.unit_price.toFixed(2)}</TableCell>
+                    <TableCell>₹{item.unit_price.toFixed(2)}</TableCell>
                     <TableCell>{item.reorder_level}</TableCell>
                   </TableRow>
                 ))}
