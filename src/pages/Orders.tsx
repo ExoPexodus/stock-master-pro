@@ -13,9 +13,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, ShoppingCart, TruckIcon, CheckCircle, XCircle, Send, Package, Clock, History } from "lucide-react";
+import { Plus, ShoppingCart, TruckIcon, CheckCircle, XCircle, Send, Package, Clock, History, Calendar } from "lucide-react";
 import { ApprovalHistoryModal } from "@/components/orders/ApprovalHistoryModal";
 import { ApprovalActionDialog } from "@/components/orders/ApprovalActionDialog";
+import { OrderTimelineModal } from "@/components/orders/OrderTimelineModal";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export default function Orders() {
@@ -24,10 +25,11 @@ export default function Orders() {
   const queryClient = useQueryClient();
   const [isCreatePOOpen, setIsCreatePOOpen] = useState(false);
   const [isCreateSOOpen, setIsCreateSOOpen] = useState(false);
-  const [poFormData, setPoFormData] = useState({ po_number: "", supplier_id: "", warehouse_id: "", total_amount: "", expected_date: "" });
+  const [poFormData, setPoFormData] = useState({ po_number: "", supplier_id: "", warehouse_id: "", total_amount: "", expected_date: "", expected_delivery_date: "" });
   const [soFormData, setSoFormData] = useState({ so_number: "", customer_name: "", warehouse_id: "", total_amount: "" });
   const [historyModal, setHistoryModal] = useState<{ open: boolean; orderId: number; poNumber: string } | null>(null);
   const [actionDialog, setActionDialog] = useState<{ open: boolean; type: string; orderId: number } | null>(null);
+  const [timelineModal, setTimelineModal] = useState<{ open: boolean; order: any } | null>(null);
 
   const { data: purchaseOrders = [] } = useQuery({
     queryKey: ["purchaseOrders"],
@@ -55,7 +57,7 @@ export default function Orders() {
       queryClient.invalidateQueries({ queryKey: ["purchaseOrders"] });
       toast({ title: "Purchase order created successfully" });
       setIsCreatePOOpen(false);
-      setPoFormData({ po_number: "", supplier_id: "", warehouse_id: "", total_amount: "", expected_date: "" });
+      setPoFormData({ po_number: "", supplier_id: "", warehouse_id: "", total_amount: "", expected_date: "", expected_delivery_date: "" });
     },
     onError: (error: any) => {
       toast({ title: "Error creating purchase order", description: error.message, variant: "destructive" });
@@ -83,6 +85,7 @@ export default function Orders() {
       warehouse_id: parseInt(poFormData.warehouse_id),
       total_amount: parseFloat(poFormData.total_amount),
       expected_date: poFormData.expected_date || undefined,
+      expected_delivery_date: poFormData.expected_delivery_date || undefined,
     });
   };
 
@@ -294,6 +297,15 @@ export default function Orders() {
                               onChange={(e) => setPoFormData({ ...poFormData, expected_date: e.target.value })}
                             />
                           </div>
+                          <div>
+                            <Label htmlFor="expected_delivery_date">Expected Delivery Date</Label>
+                            <Input
+                              id="expected_delivery_date"
+                              type="date"
+                              value={poFormData.expected_delivery_date}
+                              onChange={(e) => setPoFormData({ ...poFormData, expected_delivery_date: e.target.value })}
+                            />
+                          </div>
                         </div>
                         <DialogFooter>
                           <Button type="submit">Create</Button>
@@ -338,7 +350,16 @@ export default function Orders() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
+                                  onClick={() => setTimelineModal({ open: true, order: po })}
+                                  title="View timeline"
+                                >
+                                  <Calendar className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
                                   onClick={() => setHistoryModal({ open: true, orderId: po.id, poNumber: po.po_number })}
+                                  title="View approval history"
                                 >
                                   <History className="h-4 w-4" />
                                 </Button>
@@ -504,6 +525,14 @@ export default function Orders() {
             isLoading={
               workflowMutations[actionDialog.type as keyof typeof workflowMutations]?.isPending
             }
+          />
+        )}
+
+        {timelineModal && (
+          <OrderTimelineModal
+            order={timelineModal.order}
+            isOpen={timelineModal.open}
+            onClose={() => setTimelineModal(null)}
           />
         )}
       </div>
