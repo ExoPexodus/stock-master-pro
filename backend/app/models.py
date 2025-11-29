@@ -151,7 +151,8 @@ class Stock(db.Model):
             'item_id': self.item_id,
             'warehouse_id': self.warehouse_id,
             'quantity': self.quantity,
-            'last_updated': self.last_updated.isoformat()
+            'last_updated': self.last_updated.isoformat(),
+            'item': self.item.to_dict() if self.item else None
         }
 
 
