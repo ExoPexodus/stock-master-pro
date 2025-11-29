@@ -279,7 +279,7 @@ const Items = () => {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="unit_price">Unit Price *</Label>
+                    <Label htmlFor="unit_price">Unit Price (₹) *</Label>
                     <Input
                       id="unit_price"
                       type="number"
@@ -354,7 +354,7 @@ const Items = () => {
                       <TableCell>{item.category?.name || '-'}</TableCell>
                       <TableCell>{item.warehouse?.name || '-'}</TableCell>
                       <TableCell>{item.supplier?.name || '-'}</TableCell>
-                      <TableCell>${item.unit_price.toFixed(2)}</TableCell>
+                      <TableCell>₹{item.unit_price.toFixed(2)}</TableCell>
                       {canEdit && (
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">

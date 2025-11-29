@@ -278,7 +278,7 @@ export default function Orders() {
                             </Select>
                           </div>
                           <div>
-                            <Label htmlFor="total_amount">Total Amount *</Label>
+                            <Label htmlFor="total_amount">Total Amount (₹) *</Label>
                             <Input
                               id="total_amount"
                               type="number"
@@ -343,7 +343,7 @@ export default function Orders() {
                             <TableCell>{suppliers.find((s: any) => s.id === po.supplier_id)?.name || "-"}</TableCell>
                             <TableCell>{warehouses.find((w: any) => w.id === po.warehouse_id)?.name || "-"}</TableCell>
                             <TableCell>{getStatusBadge(po.status)}</TableCell>
-                            <TableCell>${po.total_amount.toFixed(2)}</TableCell>
+                            <TableCell>₹{po.total_amount.toFixed(2)}</TableCell>
                             <TableCell>{new Date(po.order_date).toLocaleDateString()}</TableCell>
                             <TableCell className="text-right">
                               <div className="flex items-center justify-end gap-2">
@@ -450,7 +450,7 @@ export default function Orders() {
                             </Select>
                           </div>
                           <div>
-                            <Label htmlFor="so_total_amount">Total Amount *</Label>
+                            <Label htmlFor="so_total_amount">Total Amount (₹) *</Label>
                             <Input
                               id="so_total_amount"
                               type="number"
@@ -494,7 +494,7 @@ export default function Orders() {
                           <TableCell>{so.customer_name}</TableCell>
                           <TableCell>{warehouses.find((w: any) => w.id === so.warehouse_id)?.name || "-"}</TableCell>
                           <TableCell>{getStatusBadge(so.status)}</TableCell>
-                          <TableCell>${so.total_amount.toFixed(2)}</TableCell>
+                          <TableCell>₹{so.total_amount.toFixed(2)}</TableCell>
                           <TableCell>{new Date(so.order_date).toLocaleDateString()}</TableCell>
                         </TableRow>
                       ))}
