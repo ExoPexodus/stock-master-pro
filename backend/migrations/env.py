@@ -8,8 +8,9 @@ import sys
 # Add parent directory to path
 sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), '..')))
 
+# Import all models to ensure they're registered with SQLAlchemy
 from app import db
-from app.models import User, Category, Warehouse, Supplier, Item, Stock, PurchaseOrder, SalesOrder, AuditLog, ImportJob, Notification
+import app.models
 
 # this is the Alembic Config object
 config = context.config
