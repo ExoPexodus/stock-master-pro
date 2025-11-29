@@ -2,7 +2,6 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-from flask_migrate import Migrate
 from dotenv import load_dotenv
 import os
 
@@ -10,7 +9,6 @@ load_dotenv()
 
 db = SQLAlchemy()
 jwt = JWTManager()
-migrate = Migrate()
 
 def create_app():
     app = Flask(__name__)
@@ -32,7 +30,6 @@ def create_app():
     # Initialize extensions
     db.init_app(app)
     jwt.init_app(app)
-    migrate.init_app(app, db)
     
     # JWT error handlers
     @jwt.invalid_token_loader
@@ -105,31 +102,8 @@ def create_app():
     app.register_blueprint(imports.bp)
     app.register_blueprint(notifications.bp)
     
-    # Run migrations automatically on startup
+    # Create tables
     with app.app_context():
-        try:
-            from flask_migrate import upgrade, current
-            
-            # Check if migrations directory is initialized
-            migrations_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'migrations')
-            versions_dir = os.path.join(migrations_dir, 'versions')
-            
-            if os.path.exists(versions_dir):
-                # Try to get current revision
-                try:
-                    current()
-                    app.logger.info('📊 Checking for database migrations...')
-                except Exception:
-                    app.logger.info('🔧 Initializing migration tracking...')
-                
-                # Apply any pending migrations
-                upgrade()
-                app.logger.info('✅ Database migrations applied successfully')
-            else:
-                app.logger.warning('⚠️ Migrations directory not found, skipping auto-migration')
-                
-        except Exception as e:
-            app.logger.warning(f'⚠️ Migration warning: {str(e)}')
-            # Don't fail startup if migrations have issues
+        db.create_all()
     
     return app
