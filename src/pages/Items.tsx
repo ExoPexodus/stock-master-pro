@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -11,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { api } from '@/lib/api';
+import { api, warehousesApi, suppliersApi, categoriesApi } from '@/lib/api';
 import { Item, PaginatedResponse } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { Plus, Search, Pencil, Trash2 } from 'lucide-react';
@@ -32,8 +34,33 @@ const Items = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
+  const [formData, setFormData] = useState({
+    sku: '',
+    name: '',
+    description: '',
+    category_id: '',
+    warehouse_id: '',
+    supplier_id: '',
+    unit_price: '',
+    reorder_level: '10'
+  });
   const { user } = useAuth();
   const { toast } = useToast();
+
+  const { data: warehouses = [] } = useQuery({
+    queryKey: ['warehouses'],
+    queryFn: warehousesApi.getAll,
+  });
+
+  const { data: suppliers = [] } = useQuery({
+    queryKey: ['suppliers'],
+    queryFn: suppliersApi.getAll,
+  });
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: categoriesApi.getAll,
+  });
 
   const canEdit = user?.role === 'admin' || user?.role === 'manager';
 
@@ -77,15 +104,32 @@ const Items = () => {
     }
   };
 
+  const handleEdit = (item: Item) => {
+    setEditingItem(item);
+    setFormData({
+      sku: item.sku,
+      name: item.name,
+      description: item.description || '',
+      category_id: item.category_id?.toString() || '',
+      warehouse_id: item.warehouse_id?.toString() || '',
+      supplier_id: item.supplier_id?.toString() || '',
+      unit_price: item.unit_price.toString(),
+      reorder_level: item.reorder_level.toString()
+    });
+    setIsDialogOpen(true);
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
     const data = {
-      sku: formData.get('sku'),
-      name: formData.get('name'),
-      description: formData.get('description'),
-      unit_price: parseFloat(formData.get('unit_price') as string),
-      reorder_level: parseInt(formData.get('reorder_level') as string),
+      sku: formData.sku,
+      name: formData.name,
+      description: formData.description || undefined,
+      category_id: formData.category_id ? parseInt(formData.category_id) : undefined,
+      warehouse_id: formData.warehouse_id ? parseInt(formData.warehouse_id) : undefined,
+      supplier_id: formData.supplier_id ? parseInt(formData.supplier_id) : undefined,
+      unit_price: parseFloat(formData.unit_price),
+      reorder_level: parseInt(formData.reorder_level),
     };
 
     try {
@@ -104,6 +148,16 @@ const Items = () => {
       }
       setIsDialogOpen(false);
       setEditingItem(null);
+      setFormData({
+        sku: '',
+        name: '',
+        description: '',
+        category_id: '',
+        warehouse_id: '',
+        supplier_id: '',
+        unit_price: '',
+        reorder_level: '10'
+      });
       fetchItems();
     } catch (error) {
       toast({
@@ -120,14 +174,29 @@ const Items = () => {
         <div className="flex items-center justify-between">
           <h2 className="text-3xl font-bold">Items</h2>
           {canEdit && (
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <Dialog open={isDialogOpen} onOpenChange={(open) => {
+              setIsDialogOpen(open);
+              if (!open) {
+                setEditingItem(null);
+                setFormData({
+                  sku: '',
+                  name: '',
+                  description: '',
+                  category_id: '',
+                  warehouse_id: '',
+                  supplier_id: '',
+                  unit_price: '',
+                  reorder_level: '10'
+                });
+              }
+            }}>
               <DialogTrigger asChild>
-                <Button onClick={() => setEditingItem(null)}>
+                <Button>
                   <Plus className="h-4 w-4 mr-2" />
                   Add Item
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>
                     {editingItem ? 'Edit Item' : 'Add New Item'}
@@ -135,51 +204,99 @@ const Items = () => {
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="sku">SKU</Label>
+                    <Label htmlFor="sku">SKU *</Label>
                     <Input
                       id="sku"
-                      name="sku"
+                      value={formData.sku}
+                      onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
                       required
-                      defaultValue={editingItem?.sku}
                       disabled={!!editingItem}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="name">Name</Label>
+                    <Label htmlFor="name">Name *</Label>
                     <Input
                       id="name"
-                      name="name"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       required
-                      defaultValue={editingItem?.name}
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="description">Description</Label>
                     <Input
                       id="description"
-                      name="description"
-                      defaultValue={editingItem?.description}
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="unit_price">Unit Price</Label>
+                    <Label htmlFor="category">Category</Label>
+                    <Select value={formData.category_id} onValueChange={(value) => setFormData({ ...formData, category_id: value })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
+                        {categories.map((cat: any) => (
+                          <SelectItem key={cat.id} value={cat.id.toString()}>
+                            {cat.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="warehouse">Warehouse</Label>
+                    <Select value={formData.warehouse_id} onValueChange={(value) => setFormData({ ...formData, warehouse_id: value })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select warehouse" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
+                        {warehouses.map((wh: any) => (
+                          <SelectItem key={wh.id} value={wh.id.toString()}>
+                            {wh.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="supplier">Supplier</Label>
+                    <Select value={formData.supplier_id} onValueChange={(value) => setFormData({ ...formData, supplier_id: value })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select supplier" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
+                        {suppliers.map((sup: any) => (
+                          <SelectItem key={sup.id} value={sup.id.toString()}>
+                            {sup.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="unit_price">Unit Price *</Label>
                     <Input
                       id="unit_price"
-                      name="unit_price"
                       type="number"
                       step="0.01"
+                      value={formData.unit_price}
+                      onChange={(e) => setFormData({ ...formData, unit_price: e.target.value })}
                       required
-                      defaultValue={editingItem?.unit_price}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="reorder_level">Reorder Level</Label>
+                    <Label htmlFor="reorder_level">Reorder Level *</Label>
                     <Input
                       id="reorder_level"
-                      name="reorder_level"
                       type="number"
+                      value={formData.reorder_level}
+                      onChange={(e) => setFormData({ ...formData, reorder_level: e.target.value })}
                       required
-                      defaultValue={editingItem?.reorder_level || 10}
                     />
                   </div>
                   <Button type="submit" className="w-full">
@@ -207,10 +324,14 @@ const Items = () => {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <div className="space-y-2">
-                {[...Array(5)].map((_, i) => (
+              <div className="space-y-3">
+                {[1, 2, 3, 4, 5].map((i) => (
                   <Skeleton key={i} className="h-12 w-full" />
                 ))}
+              </div>
+            ) : items.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                No items found
               </div>
             ) : (
               <Table>
@@ -218,57 +339,46 @@ const Items = () => {
                   <TableRow>
                     <TableHead>SKU</TableHead>
                     <TableHead>Name</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Unit Price</TableHead>
-                    <TableHead>Reorder Level</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Warehouse</TableHead>
+                    <TableHead>Supplier</TableHead>
+                    <TableHead>Price</TableHead>
                     {canEdit && <TableHead className="text-right">Actions</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {items.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={canEdit ? 6 : 5} className="text-center text-muted-foreground">
-                        No items found
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    items.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell className="font-medium">{item.sku}</TableCell>
-                        <TableCell>{item.name}</TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {item.description || '-'}
-                        </TableCell>
-                        <TableCell>${item.unit_price.toFixed(2)}</TableCell>
-                        <TableCell>{item.reorder_level}</TableCell>
-                        {canEdit && (
-                          <TableCell className="text-right">
-                            <div className="flex justify-end gap-2">
+                  {items.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-medium">{item.sku}</TableCell>
+                      <TableCell>{item.name}</TableCell>
+                      <TableCell>{item.category?.name || '-'}</TableCell>
+                      <TableCell>{item.warehouse?.name || '-'}</TableCell>
+                      <TableCell>{item.supplier?.name || '-'}</TableCell>
+                      <TableCell>${item.unit_price.toFixed(2)}</TableCell>
+                      {canEdit && (
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEdit(item)}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            {user?.role === 'admin' && (
                               <Button
                                 variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  setEditingItem(item);
-                                  setIsDialogOpen(true);
-                                }}
+                                size="icon"
+                                onClick={() => handleDelete(item.id)}
                               >
-                                <Pencil className="h-4 w-4" />
+                                <Trash2 className="h-4 w-4" />
                               </Button>
-                              {user?.role === 'admin' && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleDelete(item.id)}
-                                >
-                                  <Trash2 className="h-4 w-4 text-destructive" />
-                                </Button>
-                              )}
-                            </div>
-                          </TableCell>
-                        )}
-                      </TableRow>
-                    ))
-                  )}
+                            )}
+                          </div>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             )}

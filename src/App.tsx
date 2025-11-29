@@ -15,8 +15,6 @@ import Suppliers from "./pages/Suppliers";
 import Orders from "./pages/Orders";
 import AuditLogs from "./pages/AuditLogs";
 import ImportExport from "./pages/ImportExport";
-import Locations from "./pages/Locations";
-import LocationDetails from "./pages/LocationDetails";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -93,22 +91,6 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={['admin', 'manager']}>
                   <ImportExport />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/locations"
-              element={
-                <ProtectedRoute>
-                  <Locations />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/locations/:id"
-              element={
-                <ProtectedRoute>
-                  <LocationDetails />
                 </ProtectedRoute>
               }
             />
