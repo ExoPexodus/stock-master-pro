@@ -139,3 +139,52 @@ export interface PaginatedResponse<T> {
   per_page: number;
   pages: number;
 }
+
+export interface Notification {
+  id: number;
+  user_id: number;
+  title: string;
+  message?: string;
+  type?: string;
+  is_read: boolean;
+  created_at: string;
+}
+
+export interface Location {
+  id: number;
+  name: string;
+  address?: string;
+  capacity?: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StockLocation {
+  id: number;
+  item_id: number;
+  location_id: number;
+  quantity: number;
+  min_threshold: number;
+  max_threshold?: number;
+  last_updated: string;
+  updated_by?: number;
+  location?: Location;
+  item?: Item;
+}
+
+export interface StockTransfer {
+  id: number;
+  item_id: number;
+  from_location_id?: number;
+  to_location_id: number;
+  quantity: number;
+  transfer_date: string;
+  transferred_by?: number;
+  notes?: string;
+  status: string;
+  item?: Item;
+  from_location?: Location;
+  to_location?: Location;
+  transferred_by_name?: string;
+}

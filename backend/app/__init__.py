@@ -90,7 +90,11 @@ def create_app():
     )
     
     # Register blueprints
-    from app.routes import auth, items, categories, warehouses, suppliers, orders, reports, imports, notifications, approvals
+    from app.routes import (
+        auth, items, categories, warehouses, 
+        suppliers, orders, reports, imports, 
+        notifications, approvals, locations
+    )
     
     app.register_blueprint(auth.bp)
     app.register_blueprint(items.bp)
@@ -102,6 +106,7 @@ def create_app():
     app.register_blueprint(imports.bp)
     app.register_blueprint(notifications.bp)
     app.register_blueprint(approvals.bp)
+    app.register_blueprint(locations.bp)
     
     # Create tables
     with app.app_context():

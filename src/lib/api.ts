@@ -190,6 +190,25 @@ export const approvalsApi = {
     api.get<any[]>(`/approvals/purchase-order/${orderId}/history`),
 };
 
+// Locations API
+export const locationsApi = {
+  getAll: () => api.get<any[]>('/locations'),
+  getById: (id: number) => api.get<any>(`/locations/${id}`),
+  create: (data: { name: string; address?: string; capacity?: number }) =>
+    api.post<any>('/locations', data),
+  update: (id: number, data: any) => api.put<any>(`/locations/${id}`, data),
+  getLocationStock: (locationId: number, params?: { search?: string; min_qty?: number; max_qty?: number; page?: number }) =>
+    api.get<any>(`/locations/${locationId}/stock?${new URLSearchParams(params as any).toString()}`),
+  getItemStockLocations: (itemId: number) =>
+    api.get<any[]>(`/locations/stock/${itemId}`),
+  setStockLocation: (data: { item_id: number; location_id: number; quantity: number; min_threshold?: number }) =>
+    api.post<any>('/locations/stock', data),
+  transferStock: (data: { item_id: number; from_location_id?: number; to_location_id: number; quantity: number; notes?: string }) =>
+    api.post<any>('/locations/transfer', data),
+  getTransfers: (params?: { item_id?: number; location_id?: number; page?: number }) =>
+    api.get<any>(`/locations/transfers?${new URLSearchParams(params as any).toString()}`),
+};
+
 // Reports API
 export const reportsApi = {
   getDashboard: () => api.get<any>('/reports/dashboard'),

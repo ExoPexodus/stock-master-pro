@@ -228,15 +228,101 @@ class AuditLog(db.Model):
     
     user = db.relationship('User', backref='audit_logs')
     
+class Notification(db.Model):
+    __tablename__ = 'notifications'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text)
+    type = db.Column(db.String(50))  # low_stock, order_approved, etc.
+    is_read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
     def to_dict(self):
         return {
             'id': self.id,
             'user_id': self.user_id,
-            'action': self.action,
-            'entity_type': self.entity_type,
-            'entity_id': self.entity_id,
-            'details': self.details,
-            'timestamp': self.timestamp.isoformat()
+            'title': self.title,
+            'message': self.message,
+            'type': self.type,
+            'is_read': self.is_read,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+
+class Location(db.Model):
+    __tablename__ = 'locations'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, unique=True)
+    address = db.Column(db.Text)
+    capacity = db.Column(db.Integer)
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'address': self.address,
+            'capacity': self.capacity,
+            'is_active': self.is_active,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+
+
+class StockLocation(db.Model):
+    __tablename__ = 'stock_locations'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    item_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
+    location_id = db.Column(db.Integer, db.ForeignKey('locations.id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False, default=0)
+    min_threshold = db.Column(db.Integer, default=10)
+    max_threshold = db.Column(db.Integer)
+    last_updated = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_by = db.Column(db.Integer, db.ForeignKey('users.id'))
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'item_id': self.item_id,
+            'location_id': self.location_id,
+            'quantity': self.quantity,
+            'min_threshold': self.min_threshold,
+            'max_threshold': self.max_threshold,
+            'last_updated': self.last_updated.isoformat() if self.last_updated else None,
+            'updated_by': self.updated_by
+        }
+
+
+class StockTransfer(db.Model):
+    __tablename__ = 'stock_transfers'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    item_id = db.Column(db.Integer, db.ForeignKey('items.id'), nullable=False)
+    from_location_id = db.Column(db.Integer, db.ForeignKey('locations.id'))
+    to_location_id = db.Column(db.Integer, db.ForeignKey('locations.id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    transfer_date = db.Column(db.DateTime, default=datetime.utcnow)
+    transferred_by = db.Column(db.Integer, db.ForeignKey('users.id'))
+    notes = db.Column(db.Text)
+    status = db.Column(db.String(20), default='completed')
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'item_id': self.item_id,
+            'from_location_id': self.from_location_id,
+            'to_location_id': self.to_location_id,
+            'quantity': self.quantity,
+            'transfer_date': self.transfer_date.isoformat() if self.transfer_date else None,
+            'transferred_by': self.transferred_by,
+            'notes': self.notes,
+            'status': self.status
         }
 
 
