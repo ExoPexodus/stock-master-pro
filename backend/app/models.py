@@ -99,6 +99,8 @@ class Item(db.Model):
     name = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
+    warehouse_id = db.Column(db.Integer, db.ForeignKey('warehouses.id'))
+    supplier_id = db.Column(db.Integer, db.ForeignKey('suppliers.id'))
     unit_price = db.Column(db.Numeric(10, 2), nullable=False)
     reorder_level = db.Column(db.Integer, default=10)
     warranty_months = db.Column(db.Integer)
@@ -107,6 +109,8 @@ class Item(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     category = db.relationship('Category', backref='items')
+    warehouse = db.relationship('Warehouse', backref='items')
+    supplier = db.relationship('Supplier', backref='items')
     
     def to_dict(self):
         return {
@@ -115,6 +119,11 @@ class Item(db.Model):
             'name': self.name,
             'description': self.description,
             'category_id': self.category_id,
+            'category': self.category.to_dict() if self.category else None,
+            'warehouse_id': self.warehouse_id,
+            'warehouse': self.warehouse.to_dict() if self.warehouse else None,
+            'supplier_id': self.supplier_id,
+            'supplier': self.supplier.to_dict() if self.supplier else None,
             'unit_price': float(self.unit_price),
             'reorder_level': self.reorder_level,
             'warranty_months': self.warranty_months,

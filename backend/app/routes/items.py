@@ -65,6 +65,8 @@ def create_item():
         name=data['name'],
         description=data.get('description'),
         category_id=data.get('category_id'),
+        warehouse_id=data.get('warehouse_id'),
+        supplier_id=data.get('supplier_id'),
         unit_price=data['unit_price'],
         reorder_level=data.get('reorder_level', 10)
     )
@@ -100,6 +102,10 @@ def update_item(item_id):
         item.description = data['description']
     if 'category_id' in data:
         item.category_id = data['category_id']
+    if 'warehouse_id' in data:
+        item.warehouse_id = data['warehouse_id']
+    if 'supplier_id' in data:
+        item.supplier_id = data['supplier_id']
     if 'unit_price' in data:
         item.unit_price = data['unit_price']
     if 'reorder_level' in data:

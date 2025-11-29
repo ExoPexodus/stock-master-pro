@@ -43,6 +43,11 @@ export interface Item {
   name: string;
   description?: string;
   category_id?: number;
+  category?: Category;
+  warehouse_id?: number;
+  warehouse?: Warehouse;
+  supplier_id?: number;
+  supplier?: Supplier;
   unit_price: number;
   reorder_level: number;
   warranty_months?: number;
