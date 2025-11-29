@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Bell, Package, CheckCircle, XCircle, TruckIcon, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,9 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
 import { api } from '@/lib/api';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface Notification {
   id: number;
@@ -119,7 +119,10 @@ export const NotificationsPanel = () => {
               variant="ghost" 
               size="sm" 
               className="h-auto p-1 text-xs"
-              onClick={markAllAsRead}
+              onClick={(e) => {
+                e.preventDefault();
+                markAllAsRead();
+              }}
             >
               Mark all read
             </Button>
@@ -133,8 +136,8 @@ export const NotificationsPanel = () => {
             </div>
           ) : (
             notifications.map((notification) => {
-              const Icon = notificationIcons[notification.type];
-              const colorClass = notificationColors[notification.type];
+              const Icon = notificationIcons[notification.type] || Package;
+              const colorClass = notificationColors[notification.type] || 'text-blue-500';
               
               return (
                 <DropdownMenuItem
@@ -142,9 +145,14 @@ export const NotificationsPanel = () => {
                   className={`flex items-start gap-3 p-3 cursor-pointer ${
                     !notification.is_read ? 'bg-muted/50' : ''
                   }`}
-                  onClick={() => !notification.is_read && markAsRead(notification.id)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (!notification.is_read) {
+                      markAsRead(notification.id);
+                    }
+                  }}
                 >
-                  <Icon className={`h-5 w-5 mt-0.5 flex-shrink-0 ${colorClass}`} />
+                  {Icon && <Icon className={`h-5 w-5 mt-0.5 flex-shrink-0 ${colorClass}`} />}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{notification.title}</p>
                     <p className="text-xs text-muted-foreground line-clamp-2">
