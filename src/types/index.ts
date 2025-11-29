@@ -63,11 +63,29 @@ export interface PurchaseOrder {
   po_number: string;
   supplier_id: number;
   warehouse_id: number;
-  status: 'pending' | 'approved' | 'received' | 'cancelled';
+  status: 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'sent_to_vendor' | 'delivered';
   order_date: string;
   expected_date?: string;
   total_amount: number;
   created_by: number;
+  approved_by?: number;
+  approved_date?: string;
+  rejected_by?: number;
+  rejected_date?: string;
+  sent_date?: string;
+  delivered_date?: string;
+  comments?: string;
+}
+
+export interface ApprovalHistory {
+  id: number;
+  purchase_order_id: number;
+  user_id: number;
+  username: string;
+  from_status: string;
+  to_status: string;
+  comments?: string;
+  timestamp: string;
 }
 
 export interface SalesOrder {

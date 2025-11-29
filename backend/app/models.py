@@ -149,11 +149,20 @@ class PurchaseOrder(db.Model):
     po_number = db.Column(db.String(50), unique=True, nullable=False)
     supplier_id = db.Column(db.Integer, db.ForeignKey('suppliers.id'), nullable=False)
     warehouse_id = db.Column(db.Integer, db.ForeignKey('warehouses.id'), nullable=False)
-    status = db.Column(db.String(20), default='pending')
+    status = db.Column(db.String(20), default='draft')
     order_date = db.Column(db.DateTime, default=datetime.utcnow)
     expected_date = db.Column(db.DateTime)
     total_amount = db.Column(db.Numeric(10, 2))
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'))
+    
+    # Approval workflow fields
+    approved_by = db.Column(db.Integer, db.ForeignKey('users.id'))
+    approved_date = db.Column(db.DateTime)
+    rejected_by = db.Column(db.Integer, db.ForeignKey('users.id'))
+    rejected_date = db.Column(db.DateTime)
+    sent_date = db.Column(db.DateTime)
+    delivered_date = db.Column(db.DateTime)
+    comments = db.Column(db.Text)
     
     supplier = db.relationship('Supplier', backref='purchase_orders')
     warehouse = db.relationship('Warehouse', backref='purchase_orders')
@@ -168,7 +177,14 @@ class PurchaseOrder(db.Model):
             'order_date': self.order_date.isoformat(),
             'expected_date': self.expected_date.isoformat() if self.expected_date else None,
             'total_amount': float(self.total_amount) if self.total_amount else 0,
-            'created_by': self.created_by
+            'created_by': self.created_by,
+            'approved_by': self.approved_by,
+            'approved_date': self.approved_date.isoformat() if self.approved_date else None,
+            'rejected_by': self.rejected_by,
+            'rejected_date': self.rejected_date.isoformat() if self.rejected_date else None,
+            'sent_date': self.sent_date.isoformat() if self.sent_date else None,
+            'delivered_date': self.delivered_date.isoformat() if self.delivered_date else None,
+            'comments': self.comments
         }
 
 
@@ -281,4 +297,30 @@ class Notification(db.Model):
             'entity_type': self.entity_type,
             'entity_id': self.entity_id,
             'created_at': self.created_at.isoformat()
+        }
+
+
+class ApprovalHistory(db.Model):
+    __tablename__ = 'approval_history'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    purchase_order_id = db.Column(db.Integer, db.ForeignKey('purchase_orders.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    from_status = db.Column(db.String(20), nullable=False)
+    to_status = db.Column(db.String(20), nullable=False)
+    comments = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    purchase_order = db.relationship('PurchaseOrder', backref='approval_history')
+    user = db.relationship('User', backref='approvals')
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'purchase_order_id': self.purchase_order_id,
+            'user_id': self.user_id,
+            'from_status': self.from_status,
+            'to_status': self.to_status,
+            'comments': self.comments,
+            'timestamp': self.timestamp.isoformat()
         }
