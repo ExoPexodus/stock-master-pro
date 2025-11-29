@@ -11,7 +11,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, Users } from "lucide-react";
+import { Plus, Pencil, Trash2, Users, FileText } from "lucide-react";
+import { SupplierOrdersModal } from "@/components/suppliers/SupplierOrdersModal";
 
 export default function Suppliers() {
   const { user } = useAuth();
@@ -20,6 +21,7 @@ export default function Suppliers() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<any>(null);
   const [formData, setFormData] = useState({ name: "", contact_person: "", email: "", phone: "", address: "" });
+  const [viewingOrdersSupplier, setViewingOrdersSupplier] = useState<{ id: number; name: string } | null>(null);
 
   const { data: suppliers = [], isLoading } = useQuery({
     queryKey: ["suppliers"],
@@ -199,7 +201,7 @@ export default function Suppliers() {
                     <TableHead>Contact Person</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Phone</TableHead>
-                    {canModify && <TableHead className="text-right">Actions</TableHead>}
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -209,28 +211,38 @@ export default function Suppliers() {
                       <TableCell>{supplier.contact_person || "-"}</TableCell>
                       <TableCell>{supplier.email || "-"}</TableCell>
                       <TableCell>{supplier.phone || "-"}</TableCell>
-                      {canModify && (
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button variant="ghost" size="icon" onClick={() => handleEdit(supplier)}>
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            {user?.role === "admin" && (
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => {
-                                  if (confirm("Are you sure you want to delete this supplier?")) {
-                                    deleteMutation.mutate(supplier.id);
-                                  }
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4" />
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => setViewingOrdersSupplier({ id: supplier.id, name: supplier.name })}
+                            title="View order history"
+                          >
+                            <FileText className="h-4 w-4" />
+                          </Button>
+                          {canModify && (
+                            <>
+                              <Button variant="ghost" size="icon" onClick={() => handleEdit(supplier)}>
+                                <Pencil className="h-4 w-4" />
                               </Button>
-                            )}
-                          </div>
-                        </TableCell>
-                      )}
+                              {user?.role === "admin" && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => {
+                                    if (confirm("Are you sure you want to delete this supplier?")) {
+                                      deleteMutation.mutate(supplier.id);
+                                    }
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -239,6 +251,13 @@ export default function Suppliers() {
           </CardContent>
         </Card>
       </div>
+
+      <SupplierOrdersModal
+        supplierId={viewingOrdersSupplier?.id || null}
+        supplierName={viewingOrdersSupplier?.name || ""}
+        isOpen={!!viewingOrdersSupplier}
+        onClose={() => setViewingOrdersSupplier(null)}
+      />
     </Layout>
   );
 }
