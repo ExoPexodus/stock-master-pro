@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ordersApi, suppliersApi, warehousesApi } from "@/lib/api";
+import { ordersApi, suppliersApi, warehousesApi, approvalsApi } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, ShoppingCart, TruckIcon } from "lucide-react";
+import { Plus, ShoppingCart, TruckIcon, CheckCircle, XCircle, Send, Package, Clock, History } from "lucide-react";
+import { ApprovalHistoryModal } from "@/components/orders/ApprovalHistoryModal";
+import { ApprovalActionDialog } from "@/components/orders/ApprovalActionDialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export default function Orders() {
   const { user } = useAuth();
@@ -23,6 +26,8 @@ export default function Orders() {
   const [isCreateSOOpen, setIsCreateSOOpen] = useState(false);
   const [poFormData, setPoFormData] = useState({ po_number: "", supplier_id: "", warehouse_id: "", total_amount: "", expected_date: "" });
   const [soFormData, setSoFormData] = useState({ so_number: "", customer_name: "", warehouse_id: "", total_amount: "" });
+  const [historyModal, setHistoryModal] = useState<{ open: boolean; orderId: number; poNumber: string } | null>(null);
+  const [actionDialog, setActionDialog] = useState<{ open: boolean; type: string; orderId: number } | null>(null);
 
   const { data: purchaseOrders = [] } = useQuery({
     queryKey: ["purchaseOrders"],
@@ -91,20 +96,112 @@ export default function Orders() {
     });
   };
 
+  const workflowMutations = {
+    submit: useMutation({
+      mutationFn: ({ orderId, comments }: { orderId: number; comments: string }) =>
+        approvalsApi.submitForApproval(orderId, comments),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["purchaseOrders"] });
+        toast({ title: "Submitted for approval" });
+        setActionDialog(null);
+      },
+      onError: (error: any) => {
+        toast({ title: "Error", description: error.message, variant: "destructive" });
+      },
+    }),
+    approve: useMutation({
+      mutationFn: ({ orderId, comments }: { orderId: number; comments: string }) =>
+        approvalsApi.approveOrder(orderId, comments),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["purchaseOrders"] });
+        toast({ title: "Purchase order approved" });
+        setActionDialog(null);
+      },
+      onError: (error: any) => {
+        toast({ title: "Error", description: error.message, variant: "destructive" });
+      },
+    }),
+    reject: useMutation({
+      mutationFn: ({ orderId, comments }: { orderId: number; comments: string }) =>
+        approvalsApi.rejectOrder(orderId, comments),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["purchaseOrders"] });
+        toast({ title: "Purchase order rejected" });
+        setActionDialog(null);
+      },
+      onError: (error: any) => {
+        toast({ title: "Error", description: error.message, variant: "destructive" });
+      },
+    }),
+    send: useMutation({
+      mutationFn: ({ orderId, comments }: { orderId: number; comments: string }) =>
+        approvalsApi.sendToVendor(orderId, comments),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["purchaseOrders"] });
+        toast({ title: "Sent to vendor" });
+        setActionDialog(null);
+      },
+      onError: (error: any) => {
+        toast({ title: "Error", description: error.message, variant: "destructive" });
+      },
+    }),
+    deliver: useMutation({
+      mutationFn: ({ orderId, comments }: { orderId: number; comments: string }) =>
+        approvalsApi.markDelivered(orderId, comments),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["purchaseOrders"] });
+        toast({ title: "Marked as delivered" });
+        setActionDialog(null);
+      },
+      onError: (error: any) => {
+        toast({ title: "Error", description: error.message, variant: "destructive" });
+      },
+    }),
+  };
+
+  const handleWorkflowAction = (comments: string) => {
+    if (!actionDialog) return;
+    const mutation = workflowMutations[actionDialog.type as keyof typeof workflowMutations];
+    mutation.mutate({ orderId: actionDialog.orderId, comments });
+  };
+
   const getStatusBadge = (status: string) => {
     const variants: Record<string, "default" | "secondary" | "destructive"> = {
-      pending: "secondary",
+      draft: "secondary",
+      pending_approval: "secondary",
       approved: "default",
-      received: "default",
+      rejected: "destructive",
+      sent_to_vendor: "default",
+      delivered: "default",
       processing: "secondary",
       shipped: "default",
-      delivered: "default",
       cancelled: "destructive",
     };
-    return <Badge variant={variants[status] || "secondary"}>{status}</Badge>;
+    return <Badge variant={variants[status] || "secondary"}>{status.replace(/_/g, " ")}</Badge>;
   };
 
   const canCreate = user?.role === "admin" || user?.role === "manager";
+  const isAdmin = user?.role === "admin";
+
+  const getAvailableActions = (status: string) => {
+    const actions: { label: string; type: string; icon: any; variant?: any }[] = [];
+    
+    if (status === "draft" && canCreate) {
+      actions.push({ label: "Submit for Approval", type: "submit", icon: Send });
+    }
+    if (status === "pending_approval" && isAdmin) {
+      actions.push({ label: "Approve", type: "approve", icon: CheckCircle, variant: "default" });
+      actions.push({ label: "Reject", type: "reject", icon: XCircle, variant: "destructive" });
+    }
+    if (status === "approved" && canCreate) {
+      actions.push({ label: "Send to Vendor", type: "send", icon: Send });
+    }
+    if (status === "sent_to_vendor" && canCreate) {
+      actions.push({ label: "Mark Delivered", type: "deliver", icon: Package });
+    }
+    
+    return actions;
+  };
 
   return (
     <Layout>
@@ -222,19 +319,55 @@ export default function Orders() {
                         <TableHead>Status</TableHead>
                         <TableHead>Amount</TableHead>
                         <TableHead>Order Date</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {purchaseOrders.map((po: any) => (
-                        <TableRow key={po.id}>
-                          <TableCell className="font-medium">{po.po_number}</TableCell>
-                          <TableCell>{suppliers.find((s: any) => s.id === po.supplier_id)?.name || "-"}</TableCell>
-                          <TableCell>{warehouses.find((w: any) => w.id === po.warehouse_id)?.name || "-"}</TableCell>
-                          <TableCell>{getStatusBadge(po.status)}</TableCell>
-                          <TableCell>${po.total_amount.toFixed(2)}</TableCell>
-                          <TableCell>{new Date(po.order_date).toLocaleDateString()}</TableCell>
-                        </TableRow>
-                      ))}
+                      {purchaseOrders.map((po: any) => {
+                        const actions = getAvailableActions(po.status);
+                        return (
+                          <TableRow key={po.id}>
+                            <TableCell className="font-medium">{po.po_number}</TableCell>
+                            <TableCell>{suppliers.find((s: any) => s.id === po.supplier_id)?.name || "-"}</TableCell>
+                            <TableCell>{warehouses.find((w: any) => w.id === po.warehouse_id)?.name || "-"}</TableCell>
+                            <TableCell>{getStatusBadge(po.status)}</TableCell>
+                            <TableCell>${po.total_amount.toFixed(2)}</TableCell>
+                            <TableCell>{new Date(po.order_date).toLocaleDateString()}</TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setHistoryModal({ open: true, orderId: po.id, poNumber: po.po_number })}
+                                >
+                                  <History className="h-4 w-4" />
+                                </Button>
+                                {actions.length > 0 && (
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button variant="outline" size="sm">
+                                        <Clock className="h-4 w-4 mr-2" />
+                                        Actions
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                      {actions.map((action) => (
+                                        <DropdownMenuItem
+                                          key={action.type}
+                                          onClick={() => setActionDialog({ open: true, type: action.type, orderId: po.id })}
+                                        >
+                                          <action.icon className="h-4 w-4 mr-2" />
+                                          {action.label}
+                                        </DropdownMenuItem>
+                                      ))}
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                )}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
                     </TableBody>
                   </Table>
                 )}
@@ -351,6 +484,28 @@ export default function Orders() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {historyModal && (
+          <ApprovalHistoryModal
+            open={historyModal.open}
+            onOpenChange={(open) => !open && setHistoryModal(null)}
+            orderId={historyModal.orderId}
+            poNumber={historyModal.poNumber}
+          />
+        )}
+
+        {actionDialog && (
+          <ApprovalActionDialog
+            open={actionDialog.open}
+            onOpenChange={(open) => !open && setActionDialog(null)}
+            title={`${actionDialog.type.charAt(0).toUpperCase() + actionDialog.type.slice(1)} Purchase Order`}
+            description="Add any comments or notes for this action"
+            onConfirm={handleWorkflowAction}
+            isLoading={
+              workflowMutations[actionDialog.type as keyof typeof workflowMutations]?.isPending
+            }
+          />
+        )}
       </div>
     </Layout>
   );

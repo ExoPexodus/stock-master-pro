@@ -174,6 +174,22 @@ export const ordersApi = {
   createSalesOrder: (data: any) => api.post<any>('/orders/sales', data),
 };
 
+// Approvals API
+export const approvalsApi = {
+  submitForApproval: (orderId: number, comments?: string) =>
+    api.post<any>(`/approvals/purchase-order/${orderId}/submit`, { comments }),
+  approveOrder: (orderId: number, comments?: string) =>
+    api.post<any>(`/approvals/purchase-order/${orderId}/approve`, { comments }),
+  rejectOrder: (orderId: number, comments?: string) =>
+    api.post<any>(`/approvals/purchase-order/${orderId}/reject`, { comments }),
+  sendToVendor: (orderId: number, comments?: string) =>
+    api.post<any>(`/approvals/purchase-order/${orderId}/send`, { comments }),
+  markDelivered: (orderId: number, comments?: string) =>
+    api.post<any>(`/approvals/purchase-order/${orderId}/deliver`, { comments }),
+  getApprovalHistory: (orderId: number) =>
+    api.get<any[]>(`/approvals/purchase-order/${orderId}/history`),
+};
+
 // Reports API
 export const reportsApi = {
   getDashboard: () => api.get<any>('/reports/dashboard'),
