@@ -216,8 +216,26 @@ export const reportsApi = {
   getDashboard: () => api.get<any>('/reports/dashboard'),
   getLowStock: (threshold?: number) =>
     api.get<any[]>(`/reports/low-stock${threshold ? `?threshold=${threshold}` : ''}`),
-  getAuditLogs: (params?: { page?: number; per_page?: number }) =>
+  getAuditLogs: (params?: { 
+    page?: number; 
+    per_page?: number;
+    user_id?: string;
+    action?: string;
+    entity_type?: string;
+    entity_id?: string;
+    start_date?: string;
+    end_date?: string;
+  }) =>
     api.get<any>(`/reports/audit-logs?${new URLSearchParams(params as any).toString()}`),
+  exportAuditLogs: (params?: {
+    user_id?: string;
+    action?: string;
+    entity_type?: string;
+    entity_id?: string;
+    start_date?: string;
+    end_date?: string;
+  }) =>
+    api.downloadFile(`/reports/audit-logs/export?${new URLSearchParams(params as any).toString()}`),
 };
 
 // Imports API
